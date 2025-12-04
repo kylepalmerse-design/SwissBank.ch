@@ -1,0 +1,88 @@
+Create a full-featured multi-user Swiss private banking web application (exactly like Julius Baer / Pictet / Lombard Odier) using Next.js 14+ (App Router), TypeScript, Tailwind CSS, shadcn/ui, Framer Motion and lucide-react icons.
+
+CRITICAL REQUIREMENTS FOR 100% VERCEL + REPLIT COMPATIBILITY:
+- Must deploy on Vercel with ZERO errors (no 404, no hydration, no env issues)
+- NO backend, NO database — all users and data stored in lib/users-data.ts as a simple object
+- Server Components by default, "use client" only where needed
+- No app/api routes
+- middleware.ts protects all routes except / and /login
+- Static generation where possible
+
+MULTI-USER SYSTEM (this is the most important part):
+- Users are stored in lib/users-data.ts as a const object:
+  Example structure:
+  {
+    "alexander.weber": { password: "123456", name: "Alexander Weber", accounts: [...] },
+    "marina.berger": { password: "secret2025", name: "Marina Berger", ... },
+    // I will add more users myself later
+  }
+- After login with correct login+password → session stored in cookies (next-iron-session or cookies())
+- Each user has exactly 3 accounts in CHF:
+  1. Private Account (main spending)
+  2. Savings Account (with 2.15% interest label)
+  3. Investment Portfolio
+- Each account has: name, type, IBAN (valid Swiss format CH...), balance (you set realistic different amounts per user), currency: "CHF"
+- I must be able to easily change balances and add new users just by editing users-data.ts
+
+CORE FEATURES AFTER LOGIN:
+
+1. /dashboard
+   - Luxury dark/light mode (dark by default), toggle in header
+   - Greeting: "Good morning, Mr. Alexander Weber"
+   - Total wealth across all accounts in CHF
+   - Three beautiful glassmorphism cards with:
+     • Account name + type
+     • Swiss IBAN
+     • Current balance (big typography)
+     • Small mock sparkline chart
+     • "Transfer" button → opens transfer modal
+
+2. Transfer modal (SEPA & International)
+   - Select source account
+   - Input recipient IBAN (with Swiss/EU format validation)
+   - Recipient name (optional)
+   - Amount in CHF
+   - Reference
+   - Show fee (e.g. CHF 0 internal, CHF 12 external)
+   - On submit:
+     • If recipient IBAN belongs to another user in the system → money moves instantly to that user's account
+     • Otherwise → shown as outgoing external transfer
+     • Balance updates immediately
+     • Success animation + confetti (subtle)
+
+3. /transactions
+   - All transactions of current user across all accounts
+   - Filter by account and date
+   - Beautiful list with +/−, counterparty name (resolved if internal), IBAN, date
+
+4. /accounts — detailed view of each account with full history
+
+5. Login page /login
+   - Two fields: Login (e.g. alexander.weber) + Password
+   - Beautiful Swiss luxury design with gradient background
+   - On success → redirect to /dashboard
+
+6. Landing page /
+   - Minimalist Swiss private banking homepage
+   - Big "Client Login" button → /login
+
+Additional requirements:
+- Use real valid Swiss IBANs (CH93 0000 ... format)
+- All balances and users easily editable in one file (lib/users-data.ts)
+- Include at least 5 different users with different balances (from CHF 250,000 to CHF 8,500,000)
+- 30+ realistic transactions per user (salaries, dividends, transfers, bills, etc.)
+- Fully responsive (mobile = like Pictet or UBS app)
+- Custom 404 page in Swiss style
+- Logout button
+
+Output:
+Give me the COMPLETE project with exact folder structure and full content of EVERY file including:
+- lib/users-data.ts with 5+ users and editable balances
+- middleware.ts
+- package.json (exact working dependencies)
+- tsconfig.json, next.config.mjs, tailwind.config.ts
+- All pages and components
+- README.md with "How to add new user" instructions
+
+After I paste your code into a fresh Replit Next.js project → Run → Deploy to Vercel → everything must work instantly.
+Make it look extremely expensive, discreet, and 100% like a real Swiss private bank.

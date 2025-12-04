@@ -1,0 +1,73 @@
+You are an expert Next.js + Vercel deployment engineer.
+
+My current project is a multi-user Swiss private banking app (Next.js 14+ App Router, TypeScript, Tailwind, shadcn/ui) that works perfectly locally and on Replit preview, but when deployed to Vercel it shows 404 NOT_FOUND on all pages except the root.
+
+Fix the entire project so it deploys on Vercel with ZERO errors and works exactly like on localhost.
+
+Do the following changes automatically (do not ask, just apply):
+
+1. In next.config.mjs (or .js) — add or replace with this exact content:
+   /** @type {import('next').NextConfig} */
+   const nextConfig = {
+     output: "standalone",
+     trailingSlash: false,
+     reactStrictMode: true,
+     images: { unoptimized: true },
+   };
+   export default nextConfig;
+
+2. In middleware.ts — replace the entire file with this exact code (critical for App Router):
+   import { NextResponse } from 'next/server';
+   import type { NextRequest } from 'next/server';
+
+   export function middleware(request: NextRequest) {
+     const { pathname } = request.nextUrl;
+
+     // Allow public paths
+     if (
+       pathname === '/' ||
+       pathname.startsWith('/login') ||
+       pathname.startsWith('/_next') ||
+       pathname.startsWith('/api') ||
+       pathname.includes('.')
+     ) {
+       return NextResponse.next();
+     }
+
+     // Check session cookie (adjust name if yours is different)
+     const session = request.cookies.get('auth_session') || request.cookies.get('session');
+     if (!session) {
+       return NextResponse.redirect(new URL('/login', request.url));
+     }
+
+     return NextResponse.next();
+   }
+
+   export const config = {
+     matcher: ['/((?!api|_next/static|_next/image|favicon.ico|login|$).*)'],
+   };
+
+3. In vercel.json (create if not exists in root) — add:
+   {
+     "rewrites": [
+       { "source": "/((?!_next|api|login).*)", "destination": "/" }
+     ],
+     "cleanUrls": true,
+     "trailingSlash": false
+   }
+
+4. Make sure app/page.tsx exists and exports default function Home() { ... }
+5. Make sure app/login/page.tsx exists
+6. Make sure app/dashboard/page.tsx exists
+7. Add app/not-found.tsx with a beautiful 404 page (Swiss bank style)
+8. In package.json — ensure these scripts exist:
+   "dev": "next dev",
+   "build": "next build",
+   "start": "next start"
+
+9. Force Vercel to detect it as Next.js (add .vercelignore if needed with nothing inside)
+
+Apply all these changes immediately to the current project. 
+After your changes, this project MUST deploy on Vercel without 404 errors and work exactly like on Replit preview.
+Do not leave any dynamic API routes or server actions that break static output.
+Make it production-ready for Vercel right now.

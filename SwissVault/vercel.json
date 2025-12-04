@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server/index-prod.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "dist/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/server/index-prod.ts" },
+    { "src": "/(.*)", "dest": "/dist/$1" }
+  ],
+  "functions": {
+    "server/index-prod.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
